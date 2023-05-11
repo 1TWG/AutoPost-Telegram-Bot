@@ -11,4 +11,4 @@ class TelegramMessageSender(IMessageSender):
         self.bot.send_message(chat_id=chat_id, text=text)
 
     def send_animation(self, chat_id: str, animation, caption: str = ""):
-        self.bot.send_video(chat_id, animation, caption=caption)
+        self.bot.send_video(chat_id, animation, caption=caption, parse_mode='Markdown')

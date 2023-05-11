@@ -2,16 +2,16 @@ import logging
 from io import BytesIO
 
 import requests
-import telebot
 
 from scripts.IMessageSender import IMessageSender
+from scripts.factapi.FactService import FactService
 
 
 class ActivateOnetimeSendingPost:
     def __init__(self, message_sender: IMessageSender):
         self.message_sender = message_sender
 
-    def handle(self, message: telebot.types.Message) -> None:
+    def handle(self, channel_id) -> None:
         try:
             # Получаем случайный gif-файл с помощью API Giphy
             response = requests.get(
@@ -32,14 +32,18 @@ class ActivateOnetimeSendingPost:
             response.raise_for_status()
             img_bytes = BytesIO(response.content)
 
+            # Генерируем факт
+            fact_service = FactService()
+            translated_fact = fact_service.get_translated_fact()
+
             # Отправляем gif-файл пользователю
             self.send_animation(
-                message.chat.id,
+                channel_id,
                 img_bytes,
-                f'\n[Пёсель](https://t.me/{message.chat.id})'
+                f'{translated_fact}\n\n[Пёсель](https://t.me/{channel_id[1:]})'
             )
         except Exception as e:
-            logging.exception(f'Error sending GIF to chat {message.chat.id}: {e}')
+            logging.exception(f'Error sending GIF to chat {channel_id}: {e}')
 
     def send_animation(self, chat_id, animation_stream, caption=None):
         try:

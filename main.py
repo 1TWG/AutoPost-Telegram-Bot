@@ -43,7 +43,8 @@ def handle_start_command(message: telebot.types.Message) -> None:
 # Обработчик команды "Отправить сообщение в канал"
 @bot.message_handler(func=lambda message: message.text == 'Отправить сообщение в канал')
 def handle_activate_channel_command(message: telebot.types.Message) -> None:
-    activate_onetime_send.handle(message)
+    channel_id = '@grab_chan'
+    activate_onetime_send.handle(channel_id)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Активировать автопостинг')
@@ -51,9 +52,10 @@ def handle_activate_posting_command(message: telebot.types.Message) -> None:
     global continue_sending
     continue_sending = True
     # Установить интервал в секундах, через который нужно отправлять сообщения
-    interval = 3600  # Один час
+    interval = 3600 / 30  # Один час
     while continue_sending:  # Остановить отправку при установке значения `continue_sending` в `False`
-        activate_onetime_send.handle(message)
+        channel_id = '@grab_chan'
+        activate_onetime_send.handle(channel_id)
         time.sleep(interval)
 
 
