@@ -4,16 +4,11 @@ import telebot
 from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 
 from scripts.ActivateOnetimeSendingPost import ActivateOnetimeSendingPost
-from scripts.HealthCheckService import HealthCheckService
-from scripts.HealthCheckThread import HealthCheckThread
 from scripts.StartCommandHandler import StartCommandHandler
 from scripts.TelegramMessageSender import TelegramMessageSender
 
 # Укажите здесь токен вашего бота, полученный от BotFather
 TOKEN = '5229055040:AAGp21qFhH-1AAK3hQzb-xmu576CvfG-JTY'
-
-# URL для health-check запросов
-health_check_url = "http://example.com/health-check"
 
 # Создаем экземпляры классов для отправки сообщений и обработки команд
 message_sender = TelegramMessageSender(TOKEN)
@@ -66,11 +61,6 @@ def handle_stop_posting_command(message: telebot.types.Message) -> None:
     bot.send_message(message.chat.id, 'Автопостинг остановлен.')
 
 
-# Создаем экземпляры классов и запускаем поток health-check проверок
-service = HealthCheckService(health_check_url)
-thread = HealthCheckThread(service)
-thread.start()
-
 # Запускаем бота
-bot.delete_webhook()
+# bot.delete_webhook()
 bot.polling()
