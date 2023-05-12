@@ -1,3 +1,5 @@
+# main.py
+
 import time
 
 import telebot
@@ -6,20 +8,21 @@ from telebot.types import KeyboardButton, ReplyKeyboardMarkup
 from scripts.ActivateOnetimeSendingPost import ActivateOnetimeSendingPost
 from scripts.StartCommandHandler import StartCommandHandler
 from scripts.TelegramMessageSender import TelegramMessageSender
+from scripts.configmaker.get_config_value import get_config_value
 
-# Укажите здесь токен вашего бота, полученный от BotFather
-TOKEN = '5229055040:AAGp21qFhH-1AAK3hQzb-xmu576CvfG-JTY'
+BOT_TOKEN = get_config_value('DEFAULT', 'BotToken', 'Введите токен бота: ')
+CHANNEL_ID = get_config_value('DEFAULT', 'ChannelID', 'Введите ID канала: ')
+POST_DELAY = get_config_value('DEFAULT', 'PostDelay', 'Введите периодичность публикации(сек): ', type_hint=int)
+# Флаг, указывающий, нужно ли продолжать отправлять сообщения
+continue_sending = False
 
 # Создаем экземпляры классов для отправки сообщений и обработки команд
-message_sender = TelegramMessageSender(TOKEN)
+message_sender = TelegramMessageSender(BOT_TOKEN)
 start_handler = StartCommandHandler(message_sender=message_sender)
 activate_onetime_send = ActivateOnetimeSendingPost(message_sender=message_sender)
 
 # Создаем экземпляр бота
-bot = telebot.TeleBot(TOKEN)
-
-# Флаг, указывающий, нужно ли продолжать отправлять сообщения
-continue_sending = False
+bot = telebot.TeleBot(BOT_TOKEN)
 
 
 # Обработчик команды /start
@@ -38,8 +41,7 @@ def handle_start_command(message: telebot.types.Message) -> None:
 # Обработчик команды "Отправить сообщение в канал"
 @bot.message_handler(func=lambda message: message.text == 'Отправить сообщение в канал')
 def handle_activate_channel_command(message: telebot.types.Message) -> None:
-    channel_id = '@grab_chan'
-    activate_onetime_send.handle(channel_id)
+    activate_onetime_send.handle(CHANNEL_ID)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Активировать автопостинг')
@@ -47,10 +49,9 @@ def handle_activate_posting_command(message: telebot.types.Message) -> None:
     global continue_sending
     continue_sending = True
     # Установить интервал в секундах, через который нужно отправлять сообщения
-    interval = 3600 / 30  # Один час
-    while continue_sending:  # Остановить отправку при установке значения `continue_sending` в `False`
-        channel_id = '@grab_chan'
-        activate_onetime_send.handle(channel_id)
+    interval = POST_DELAY
+    while continue_sending:
+        activate_onetime_send.handle(CHANNEL_ID)
         time.sleep(interval)
 
 
@@ -61,6 +62,4 @@ def handle_stop_posting_command(message: telebot.types.Message) -> None:
     bot.send_message(message.chat.id, 'Автопостинг остановлен.')
 
 
-# Запускаем бота
-# bot.delete_webhook()
 bot.polling()
