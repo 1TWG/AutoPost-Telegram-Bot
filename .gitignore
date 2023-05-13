@@ -1,1 +1,5 @@
 settings.ini
+dist
+build
+main.spec
+venv
