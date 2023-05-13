@@ -26,3 +26,14 @@ def get_config_value(section: str, option: str, prompt: str = None, type_hint=st
     else:
         value = type_hint(value_str)
     return value
+
+
+def set_config_value(section: str, option: str, value: str) -> None:
+    config = configparser.ConfigParser()
+    if not os.path.exists(SETTINGS_FILE_PATH):
+        with open(SETTINGS_FILE_PATH, 'w') as f:
+            config.write(f)
+    config.read(SETTINGS_FILE_PATH)
+    config.set(section, option, value)
+    with open(SETTINGS_FILE_PATH, 'w') as f:
+        config.write(f)
