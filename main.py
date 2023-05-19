@@ -84,4 +84,8 @@ def change_delay(message: telebot.types.Message) -> None:
 
 
 if __name__ == '__main__':
-    bot.polling()
+    while True:
+        try:
+            bot.polling()
+        except Exception as e:
+            print(e)
